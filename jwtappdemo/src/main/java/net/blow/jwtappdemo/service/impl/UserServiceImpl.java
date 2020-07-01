@@ -14,20 +14,27 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of {@link UserService} interface.
+ * Wrapper for {@link UserRepository} + business logic.
+ *
+ * @author Konstantin Besednikov
+ * @version 1.0
+ */
+
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -36,11 +43,12 @@ public class UserServiceImpl implements UserService {
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
 
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(userRoles);
         user.setStatus(Status.ACTIVE);
 
         User registeredUser = userRepository.save(user);
+
         log.info("IN register - user: {} successfully registered", registeredUser);
 
         return registeredUser;
@@ -54,27 +62,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUserName(String username) {
-        User result = userRepository.findByUserName(username);
-        log.info("IN findByUserName - user: {} found by userName: {}", result, username);
+    public User findByUsername(String username) {
+        User result = userRepository.findByUsername(username);
+        log.info("IN findByUsername - user: {} found by username: {}", result, username);
         return result;
     }
 
     @Override
-    public User findById(long id) {
+    public User findById(Long id) {
         User result = userRepository.findById(id).orElse(null);
 
-        if(result == null) {
-            log.warn("IN findById - no user found by id {}", id);
+        if (result == null) {
+            log.warn("IN findById - no user found by id: {}", id);
             return null;
         }
-        log.info("IN findById - user: {} found by id: {}", result);
+
+        log.info("IN findById - user: {} found by id: {}", result, id);
         return result;
     }
 
     @Override
     public void delete(Long id) {
         userRepository.deleteById(id);
-        log.info("IN deleted - user with id: {} successfully deleted ");
+        log.info("IN delete - user with id: {} successfully deleted",id);
     }
 }

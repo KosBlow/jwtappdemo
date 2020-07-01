@@ -1,12 +1,20 @@
 package net.blow.jwtappdemo.security.jwt;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.blow.jwtappdemo.model.User;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-
 import java.util.Collection;
 import java.util.Date;
+
+/**
+ * Spring Security wrapper for class {@link User}.
+ *
+ * @author Konstantin Besednikov
+ * @version 1.0
+ */
 
 public class JwtUser implements UserDetails {
 
@@ -25,21 +33,20 @@ public class JwtUser implements UserDetails {
             String username,
             String firstName,
             String lastName,
-            String password,
             String email,
+            String password, Collection<? extends GrantedAuthority> authorities,
             boolean enabled,
-            Date lastPasswordResetDate,
-            Collection<? extends GrantedAuthority> authorities
+            Date lastPasswordResetDate
     ) {
         this.id = id;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
         this.email = email;
+        this.password = password;
+        this.authorities = authorities;
         this.enabled = enabled;
         this.lastPasswordResetDate = lastPasswordResetDate;
-        this.authorities = authorities;
     }
 
     @JsonIgnore
@@ -70,11 +77,11 @@ public class JwtUser implements UserDetails {
         return true;
     }
 
-    public String getFirstName() {
+    public String getFirstname() {
         return firstName;
     }
 
-    public String getLastName() {
+    public String getLastname() {
         return lastName;
     }
 
